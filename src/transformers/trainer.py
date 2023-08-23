@@ -73,8 +73,8 @@ from .trainer_callback import (
     PrinterCallback,
     ProgressCallback,
     TrainerCallback,
-    TrainerControl,
-    TrainerState,
+    TrainerControl,  # 这个类提供了一种用于控制训练循环的机制，例如，当用户想要在某个特定的迭代步数时停止训练
+    TrainerState,  # 这个类用于保存训练器的状态，包括当前的epoch、迭代步数、最佳指标值等
 )
 from .trainer_pt_utils import (
     DistributedTensorGatherer,
@@ -105,9 +105,9 @@ from .trainer_utils import (
     IntervalStrategy,
     PredictionOutput,
     RemoveColumnsCollator,
-    ShardedDDPOption,
+    ShardedDDPOption,  # 用于支持使用混合精度和ZeRO进行分布式训练
     TrainerMemoryTracker,
-    TrainOutput,
+    TrainOutput,  # 这个类用于返回训练过程的结果，包括训练损失、训练步数等
     default_compute_objective,
     denumpify_detensorize,
     enable_full_determinism,
@@ -225,7 +225,7 @@ OPTIMIZER_NAME = "optimizer.pt"
 SCHEDULER_NAME = "scheduler.pt"
 SCALER_NAME = "scaler.pt"
 
-
+# 用于训练和评估Transformers模型
 class Trainer:
     """
     Trainer is a simple but feature-complete training and eval loop for PyTorch, optimized for 🤗 Transformers.
@@ -1455,6 +1455,7 @@ class Trainer:
 
         return model
 
+    # 这个方法负责整个训练过程，它包括遍历数据集、计算损失、计算梯度、更新模型参数以及日志记录等
     def train(
         self,
         resume_from_checkpoint: Optional[Union[str, bool]] = None,
@@ -1812,6 +1813,7 @@ class Trainer:
                 rng_to_sync = True
 
             step = -1
+            # 遍历数据集：train方法通过使用dataloader来遍历训练数据集
             for step, inputs in enumerate(epoch_iterator):
                 total_batched_samples += 1
                 if rng_to_sync:
@@ -2704,6 +2706,7 @@ class Trainer:
             labels = inputs.pop("labels")
         else:
             labels = None
+        # 计算损失：损失计算在training_step方法中，接收输入数据并产生预测输出，然后，这个预测输出会与真实输出（标签）进行比较，以计算损失
         outputs = model(**inputs)
         # Save past state if it exists
         # TODO: this needs to be fixed and made cleaner later.
